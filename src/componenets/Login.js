@@ -35,7 +35,7 @@ const Login = () => {
       >
         <div className="max-w-md w-full p-8 bg-gray-900 text-white shadow-2xl rounded-2xl">
           <div className="flex flex-col items-center gap-6">
-            <h1 className="text-3xl font-bold mb-4 text-center text-yellow-400">
+            <h1 className="text-3xl font-bold mb-4 text-center text-purple-600">
               Welcome to Smart Mails
             </h1>
             <p className="text-gray-400 text-center mb-6">

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { replyEmail } from "./AIreply";
 
 const Home = () => {
     const [profile, setProfile] = useState(null);
@@ -25,7 +26,7 @@ const Home = () => {
     const fetchEmailSummary = async () => {
         setLoading(true);
         try {
-            const response = await fetch("http://localhost:4000/auth/email_summarise", {
+            const response = await fetch("http://localhost:4000/auth/email/summarise", {
                 method: "GET",
             });
             const data = await response.json();
@@ -37,6 +38,27 @@ const Home = () => {
         }
         setLoading(false);
     };
+
+    const replyEmail = async (emailBody, senderEmail, myEmail) => {
+        setLoading(true);
+        try {
+            const response = await fetch("http://localhost:4000/auth/email/reply", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json", 
+                },
+                body: JSON.stringify({ emailBody, senderEmail, myEmail }), 
+            });
+    
+            const data = await response.json();
+            console.log("Response:", data); 
+    
+        } catch (error) {
+            console.error("Error fetching email reply:", error);
+        }
+        setLoading(false);
+    };
+    
 
     return (
         <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col justify-center items-center p-6">
@@ -100,7 +122,7 @@ const Home = () => {
                                 hover:before:opacity-75 animate-gradient hover:scale-105 hover:animate-pulse"
                 disabled={loading}
             >
-                {loading ? "⏳ Fetching..." : "✨ Summarize Last 10 Emails"}
+                {loading ? "⏳ Fetching...API is slow, Grab a Coffee☕" : "✨ Summarize Last 5 Emails"}
             </button>
 
             {/* Email Summary Display */}
@@ -108,13 +130,13 @@ const Home = () => {
     {emailSummary.length > 0 && (
         <h2 className="text-gray-300 text-2xl font-bold mb-6">📩 Email Summaries</h2>
     )}
-    {emailSummary.map((email) => {
+    {emailSummary?.map((email) => {
         const sentimentStyles = {
             positive: "from-green-400 to-green-600 border-green-500 shadow-green-500/40",
             negative: "from-red-400 to-red-600 border-red-500 shadow-red-500/40",
             neutral: "from-yellow-400 to-yellow-600 border-yellow-500 shadow-yellow-500/40"
         };
-        const sentimentClass = sentimentStyles[email.emailDetails.sentiment] || "from-gray-400 to-gray-600 border-gray-500 shadow-gray-500/40";
+        const sentimentClass = sentimentStyles[email?.emailDetails?.sentiment] || "from-gray-400 to-gray-600 border-gray-500 shadow-gray-500/40";
 
         return (
             <div 
@@ -126,10 +148,10 @@ const Home = () => {
                     {email?.emailDetails?.sentiment?.charAt(0).toUpperCase() + email?.emailDetails?.sentiment?.slice(1)}
                 </div>
                 <p className="text-gray-200 text-lg font-semibold mt-4">Summary:</p>
-                <p className="text-gray-400 text-md leading-relaxed">{email.emailDetails.summary}</p>
+                <p className="text-gray-400 text-md leading-relaxed">{email?.emailDetails?.summary}</p>
                 <div className="flex flex-col items-center justify-between">
                     <button 
-                        onClick={() => console.log('replying to email...' + email.id)}
+                        onClick={() => replyEmail(email?.emailDetails?.summary, email?.senderEmail, profile?.email)}
                         className="mt-4 w-1/2 py-3 font-semibold rounded-full relative overflow-hidden text-white 
                                 border-none transition-all duration-300 ease-in-out 
                                 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 
